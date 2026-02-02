@@ -25,29 +25,32 @@ export async function apiRequest(
   { method = 'GET', body, token, query, headers } = {},
 ) {
   const url = buildUrl(path, query);
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: {
+        Accept: 'application/json',
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(headers || {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
 
-  const res = await fetch(url, {
-    method,
-    headers: {
-      Accept: 'application/json',
-      ...(body ? { 'Content-Type': 'application/json' } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(headers || {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+    const data = await parseJsonSafe(res);
 
-  const data = await parseJsonSafe(res);
+    if (!res.ok) {
+      const message =
+        (data && (data.message || data.error)) ||
+        (typeof data === 'string' ? data : 'Request failed');
+      const error = new Error(message);
+      error.status = res.status;
+      error.data = data;
+      throw error;
+    }
 
-  if (!res.ok) {
-    const message =
-      (data && (data.message || data.error)) ||
-      (typeof data === 'string' ? data : 'Request failed');
-    const error = new Error(message);
-    error.status = res.status;
-    error.data = data;
-    throw error;
+    return data;
+  } catch (error) {
+    console.log(error);
   }
-
-  return data;
 }
