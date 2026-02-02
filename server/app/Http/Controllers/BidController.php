@@ -41,7 +41,7 @@ class BidController extends Controller
 
     public function auctionBids(Auction $auction)
     {
-        if (!Auth::check() || !(Auth::user()->isAdmin() ?? false)) {
+        if (!Auth::check() || !(Auth::user()->isAdmin())) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -59,7 +59,7 @@ class BidController extends Controller
 
     public function userBids(User $user)
     {
-        if (!Auth::check() || !(Auth::user()->isAdmin() ?? false)) {
+        if (!Auth::check() || !(Auth::user()->isAdmin())) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -150,7 +150,7 @@ class BidController extends Controller
      */
     public function update(Request $request, Bid $bid)
     {
-        if (!Auth::check() || ($bid->user_id !== Auth::id() && !(Auth::user()->isAdmin() ?? false))) {
+        if (!Auth::check() || ($bid->user_id !== Auth::id() && !(Auth::user()->isAdmin()))) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -193,7 +193,7 @@ class BidController extends Controller
      */
     public function destroy(Bid $bid)
     {
-        if (!Auth::check() || ($bid->user_id !== Auth::id() && !(Auth::user()->isAdmin() ?? false))) {
+        if (!Auth::check() || ($bid->user_id !== Auth::id() && !(Auth::user()->isAdmin()))) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

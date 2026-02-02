@@ -40,7 +40,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Auth::check() || !(Auth::user()->is_admin ?? false)) {
+        if (!Auth::check() || !(Auth::user()->isAdmin())) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -80,7 +80,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        if (!Auth::check() || !(Auth::user()->is_admin ?? false)) {
+        if (!Auth::check() || !(Auth::user()->isAdmin())) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -114,7 +114,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        if (!Auth::check() || !(Auth::user()->is_admin ?? false)) {
+        if (!Auth::check() || !(Auth::user()->isAdmin())) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
