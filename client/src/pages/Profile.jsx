@@ -6,6 +6,7 @@ import { parseLaravelDate } from '../utils/formaters';
 import BuyerParticipationTable from '../components/profile/BuyerParticipationTable';
 import SellerAuctionsTable from '../components/profile/SellerAuctionsTable';
 import ProfileHeader from '../components/profile/ProfileHeader';
+import CreateAuctionModal from '../components/modals/CreateAuctionModal';
 import { FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
 
 export default function Profile() {
@@ -28,7 +29,8 @@ export default function Profile() {
   const auctionsError = useAuctionsStore((s) => s.error);
   const clearAuctionsError = useAuctionsStore((s) => s.clearError);
 
-  const [fallbackAuctionsById, setFallbackAuctionsById] = useState({}); // for bids missing auction object
+  const [fallbackAuctionsById, setFallbackAuctionsById] = useState({});
+  const [createOpen, setCreateOpen] = useState(false);
 
   const role = user?.role || null;
   const loading = authLoading || bidsLoading || auctionsLoading;
@@ -225,14 +227,14 @@ export default function Profile() {
                     My auctions
                   </h2>
                   <p className='mt-1 text-sm text-white/70'>
-                    Auctions you created (Create button is placeholder for now).
+                    Auctions you created
                   </p>
                 </div>
 
                 <button
                   type='button'
                   className='inline-flex items-center justify-center rounded-2xl bg-white/15 hover:bg-white/20 border border-white/10 text-white font-medium px-4 py-2.5 shadow-md transition'
-                  onClick={() => {}}
+                  onClick={() => setCreateOpen(true)}
                 >
                   Create Auction
                 </button>
@@ -247,6 +249,14 @@ export default function Profile() {
           )}
         </div>
       </div>
+
+      <CreateAuctionModal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreated={() => {
+          load();
+        }}
+      />
     </div>
   );
 }
