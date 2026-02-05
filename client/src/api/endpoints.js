@@ -18,4 +18,8 @@ export const API = {
   bid: (id) => `/bids/${id}`,
   auctionBids: (auctionId) => `/auctions/${auctionId}/bids`,
   userBids: (userId) => `/users/${userId}/bids`,
+
+  // transactions
+  transactions: '/transactions',
+  transaction: (id) => `/transactions/${id}`,
 };
