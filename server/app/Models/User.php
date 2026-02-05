@@ -48,6 +48,11 @@ class User extends Authenticatable
         return $this->hasMany(Bid::class);
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'buyer_id');
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;

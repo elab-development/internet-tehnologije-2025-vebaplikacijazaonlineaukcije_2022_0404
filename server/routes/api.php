@@ -4,7 +4,7 @@ use App\Http\Controllers\AuctionController;
 use App\Http\Controllers\BidController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +37,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         ->only(['index', 'show', 'store', 'update', 'destroy']);
     Route::get('/auctions/{auction}/bids', [BidController::class, 'auctionBids']);
     Route::get('/users/{user}/bids', [BidController::class, 'userBids']);
+
+    Route::get('/transactions', [TransactionController::class, 'index']);
+    Route::get('/transactions/{transaction}', [TransactionController::class, 'show']);
+    Route::post('/transactions', [TransactionController::class, 'store']);
 
     Route::get('/me', [UserController::class, 'me']);
     Route::post('/logout', [UserController::class, 'logout']);

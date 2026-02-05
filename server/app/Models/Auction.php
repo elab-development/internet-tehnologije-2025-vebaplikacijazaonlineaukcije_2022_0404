@@ -34,4 +34,9 @@ class Auction extends Model
     {
         return $this->hasMany(Bid::class);
     }
+
+    public function transaction()
+    {
+        return $this->hasOne(Transaction::class);
+    }
 }
