@@ -6,7 +6,7 @@ export default function GuestOnly() {
   const location = useLocation();
 
   if (token) {
-    const redirectTo = location.state?.from?.pathname || '/profile';
+    const redirectTo = location.state?.from?.pathname || '/';
     return <Navigate to={redirectTo} replace />;
   }
 

@@ -3,6 +3,8 @@ import { useAuthStore } from '../stores/auth.store';
 import { useBidsStore } from '../stores/bids.store';
 import { useAuctionsStore } from '../stores/auctions.store';
 import { parseLaravelDate } from '../utils/formaters';
+import { useTransactionsStore } from '../stores/transactions.store';
+import PayTransactionModal from '../components/modals/PayTransactionModal';
 import BuyerParticipationTable from '../components/profile/BuyerParticipationTable';
 import SellerAuctionsTable from '../components/profile/SellerAuctionsTable';
 import ProfileHeader from '../components/profile/ProfileHeader';
@@ -29,19 +31,30 @@ export default function Profile() {
   const auctionsError = useAuctionsStore((s) => s.error);
   const clearAuctionsError = useAuctionsStore((s) => s.clearError);
 
+  const transactions = useTransactionsStore((s) => s.transactions);
+  const fetchTransactions = useTransactionsStore((s) => s.fetchTransactions);
+  const createTransaction = useTransactionsStore((s) => s.createTransaction); // nije neophodno ovde
+  const txLoading = useTransactionsStore((s) => s.loading);
+  const txError = useTransactionsStore((s) => s.error);
+  const clearTxError = useTransactionsStore((s) => s.clearError);
+
   const [fallbackAuctionsById, setFallbackAuctionsById] = useState({});
   const [createOpen, setCreateOpen] = useState(false);
+  const [payOpen, setPayOpen] = useState(false);
+  const [payRow, setPayRow] = useState(null);
 
   const role = user?.role || null;
-  const loading = authLoading || bidsLoading || auctionsLoading;
+  const loading = authLoading || bidsLoading || auctionsLoading || txLoading;
 
   const errorText =
     authError?.message ||
     bidsError?.message ||
     auctionsError?.message ||
+    txError?.message ||
     authError?.data?.message ||
     bidsError?.data?.message ||
     auctionsError?.data?.message ||
+    txError?.data?.message ||
     null;
 
   const load = async () => {
@@ -51,6 +64,7 @@ export default function Profile() {
       if (token && !user) await me();
 
       if (role === 'buyer') {
+        await fetchTransactions();
         const data = await fetchMyBids();
 
         const list = data?.bids ?? [];
@@ -175,6 +189,15 @@ export default function Profile() {
     });
   }, [auctions, role]);
 
+  const paidByAuctionId = useMemo(() => {
+    const map = {};
+    (transactions || []).forEach((t) => {
+      const aid = t?.auction?.id ?? t?.auction_id ?? null;
+      if (aid) map[aid] = t;
+    });
+    return map;
+  }, [transactions]);
+
   return (
     <div className='min-h-[calc(100vh-96px)]'>
       <div className='mx-auto max-w-6xl px-4 py-8'>
@@ -216,7 +239,14 @@ export default function Profile() {
               </p>
 
               <div className='mt-5'>
-                <BuyerParticipationTable rows={buyerRows} />
+                <BuyerParticipationTable
+                  rows={buyerRows}
+                  paidByAuctionId={paidByAuctionId}
+                  onPay={(row) => {
+                    setPayRow(row);
+                    setPayOpen(true);
+                  }}
+                />
               </div>
             </div>
           ) : role === 'seller' ? (
@@ -255,6 +285,21 @@ export default function Profile() {
         onClose={() => setCreateOpen(false)}
         onCreated={() => {
           load();
+        }}
+      />
+
+      <PayTransactionModal
+        open={payOpen}
+        onClose={() => {
+          setPayOpen(false);
+          setPayRow(null);
+        }}
+        row={payRow}
+        existingTransaction={
+          payRow ? paidByAuctionId?.[payRow.auctionId] : null
+        }
+        onPaid={() => {
+          fetchTransactions().catch(() => {});
         }}
       />
     </div>

@@ -9,8 +9,6 @@ export default function AuthBootstrap({ children }) {
 
   const ran = useRef(false);
 
-  console.log(user);
-
   useEffect(() => {
     if (ran.current) return;
     ran.current = true;
