@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+    branches: [main, development]
+
+jobs:
+  test-client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout koda
+        uses: actions/checkout@v4
+
+      - name: Podešavanje Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Instalacija zavisnosti i testiranje
+        working-directory: ./client
+        run: |
+          npm install
+          npm run test
+
+  build-docker:
+    needs: test-client
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout koda
+        uses: actions/checkout@v4
+
+      - name: Build Server Image
+        run: docker build -t server ./server
+
+      - name: Build Client Image
+        run: docker build -t client ./client
+
+      - name: Provera Docker Compose-a
+        run: docker compose config
