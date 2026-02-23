@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import { FiTag, FiClock, FiTrendingUp, FiUser } from 'react-icons/fi';
 import { formatDate, formatMoney } from '../utils/formaters';
+import { useCurrencyStore } from '../stores/currency.store';
 
 export default function AuctionCard({ auction }) {
   const highestOrStart = auction?.highest_bid ?? auction?.start_price ?? null;
   const categoryName = auction?.category?.name || 'Uncategorized';
   const sellerName = auction?.user?.name || 'Unknown seller';
+  useCurrencyStore((s) => s.currency);
 
   return (
     <Link

@@ -5,6 +5,7 @@ import { FiArrowLeft, FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
 import { useAuctionsStore } from '../stores/auctions.store';
 import { useBidsStore } from '../stores/bids.store';
 import { useAuthStore } from '../stores/auth.store';
+import { getAuctionImageUrl } from '../api/images.api';
 
 import AuctionSummary from '../components/auction/AuctionSummary';
 import WinnerCard from '../components/auction/WinnerCard';
@@ -97,6 +98,15 @@ export default function AuctionDetails() {
           </div>
         ) : auction ? (
           <div className='mt-6 space-y-4'>
+            <div className='rounded-2xl border border-white/10 bg-white/10 overflow-hidden shadow-lg'>
+              <img
+                src={getAuctionImageUrl(auction?.title)}
+                alt={auction?.title || 'Auction image'}
+                className='w-full h-56 object-cover'
+                loading='lazy'
+              />
+            </div>
+
             <AuctionSummary auction={auction} />
 
             <div className='grid lg:grid-cols-2 gap-4'>

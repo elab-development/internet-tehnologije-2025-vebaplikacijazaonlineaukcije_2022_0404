@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { formatMoney, formatDate } from '../../utils/formaters';
+import { useCurrencyStore } from '../../stores/currency.store';
 
 function StatusPill({ status }) {
   const base =
@@ -29,9 +30,11 @@ export default function BuyerParticipationTable({
     );
   }
 
+  useCurrencyStore((s) => s.currency);
+
   return (
     <div className='overflow-x-auto rounded-2xl border border-white/10 bg-white/5'>
-      <table className='min-w-[760px] w-full text-left'>
+      <table className='min-w-190 w-full text-left'>
         <thead className='text-xs text-white/70'>
           <tr className='border-b border-white/10'>
             <th className='px-4 py-3'>Auction</th>

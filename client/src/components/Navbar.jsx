@@ -8,7 +8,8 @@ import {
   FiMenu,
   FiX,
 } from 'react-icons/fi';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useCurrencyStore } from '../stores/currency.store';
 
 const navLinkClass = ({ isActive }) =>
   [
@@ -22,6 +23,9 @@ export default function Navbar() {
   const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const currency = useCurrencyStore((s) => s.currency);
+  const setCurrency = useCurrencyStore((s) => s.setCurrency);
+  const loadRates = useCurrencyStore((s) => s.loadRates);
 
   const [open, setOpen] = useState(false);
 
@@ -30,6 +34,10 @@ export default function Navbar() {
     setOpen(false);
     navigate('/login');
   };
+
+  useEffect(() => {
+    loadRates().catch(() => {});
+  }, []);
 
   return (
     <header className='sticky top-0 z-50'>
@@ -45,6 +53,17 @@ export default function Navbar() {
 
           {/* Desktop right */}
           <div className='hidden sm:flex items-center gap-2'>
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              className=' px-3 py-2 rounded-xl text-sm font-medium transition
+             border border-white/10 bg-white/10 text-black
+             hover:bg-white/15 outline-none'
+            >
+              <option value='EUR'>EUR</option>
+              <option value='RSD'>RSD</option>
+              <option value='USD'>USD</option>
+            </select>
             {!token ? (
               <>
                 <NavLink to='/login' className={navLinkClass}>

@@ -14,7 +14,7 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('buyer'); // buyer | seller
+  const [role, setRole] = useState('buyer');
 
   useEffect(() => {
     if (token) navigate('/profile', { replace: true });

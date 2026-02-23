@@ -4,11 +4,13 @@ import {
   formatDate,
   parseLaravelDate,
 } from '../../utils/formaters';
+import { useCurrencyStore } from '../../stores/currency.store';
 
 export default function AuctionSummary({ auction }) {
   const current = auction?.highest_bid ?? auction?.start_price ?? null;
   const categoryName = auction?.category?.name || 'Uncategorized';
   const sellerName = auction?.user?.name || 'Unknown seller';
+  useCurrencyStore((s) => s.currency);
 
   const start = parseLaravelDate(auction?.start_time);
   const end = parseLaravelDate(auction?.end_time);

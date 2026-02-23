@@ -1,12 +1,20 @@
-export function formatMoney(value) {
+import { useCurrencyStore } from '../stores/currency.store';
+
+export function formatMoney(value, forcedCurrency) {
   if (value === null || value === undefined) return '—';
   const n = Number(value);
   if (Number.isNaN(n)) return String(value);
+
+  const state = useCurrencyStore.getState();
+  const currency = forcedCurrency || state.currency || 'EUR';
+
+  const converted = currency === 'EUR' ? n : state.convertFromEUR(n);
+
   return new Intl.NumberFormat(undefined, {
     style: 'currency',
-    currency: 'EUR',
+    currency,
     maximumFractionDigits: 2,
-  }).format(n);
+  }).format(converted);
 }
 
 export function parseLaravelDate(value) {

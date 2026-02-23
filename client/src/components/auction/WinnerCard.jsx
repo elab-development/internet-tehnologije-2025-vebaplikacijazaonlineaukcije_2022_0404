@@ -1,9 +1,11 @@
 import { FiAward } from 'react-icons/fi';
 import { formatMoney } from '../../utils/formaters';
+import { useCurrencyStore } from '../../stores/currency.store';
 
 export default function WinnerCard({ auction, leadingBid }) {
   const hasAnyBid = !!auction?.highest_bid && Number(auction.highest_bid) > 0;
   const canShowLeader = !!leadingBid?.user?.name;
+  useCurrencyStore((s) => s.currency);
 
   return (
     <div className='rounded-2xl border border-white/10 bg-white/10 backdrop-blur-xl shadow-lg p-6 text-white'>

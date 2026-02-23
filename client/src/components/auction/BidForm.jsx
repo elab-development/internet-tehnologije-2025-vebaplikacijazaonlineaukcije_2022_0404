@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FiDollarSign, FiAlertTriangle } from 'react-icons/fi';
 import { formatMoney, parseLaravelDate } from '../../utils/formaters';
+import { useCurrencyStore } from '../../stores/currency.store';
 
 export default function BidForm({
   auction,
@@ -10,6 +11,7 @@ export default function BidForm({
   onSubmitBid,
   errorText,
 }) {
+  useCurrencyStore((s) => s.currency);
   const [amount, setAmount] = useState('');
 
   const now = new Date();

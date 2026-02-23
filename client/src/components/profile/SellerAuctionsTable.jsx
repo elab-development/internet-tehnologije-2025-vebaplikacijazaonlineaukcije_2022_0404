@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { formatMoney, formatDate } from '../../utils/formaters';
+import { useCurrencyStore } from '../../stores/currency.store';
 
 export default function SellerAuctionsTable({ rows }) {
+  useCurrencyStore((s) => s.currency);
+
   if (!rows?.length) {
     return (
       <div className='rounded-2xl border border-white/10 bg-white/5 p-5 text-white/80'>
@@ -12,7 +15,7 @@ export default function SellerAuctionsTable({ rows }) {
 
   return (
     <div className='overflow-x-auto rounded-2xl border border-white/10 bg-white/5'>
-      <table className='min-w-[860px] w-full text-left'>
+      <table className='min-w-215 w-full text-left'>
         <thead className='text-xs text-white/70'>
           <tr className='border-b border-white/10'>
             <th className='px-4 py-3'>Title</th>

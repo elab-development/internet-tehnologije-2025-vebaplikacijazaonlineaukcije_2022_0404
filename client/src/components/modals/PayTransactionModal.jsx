@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FiX, FiAlertTriangle, FiCheckCircle } from 'react-icons/fi';
 import { formatMoney, formatDate } from '../../utils/formaters';
 import { useTransactionsStore } from '../../stores/transactions.store';
+import { useCurrencyStore } from '../../stores/currency.store';
 
 export default function PayTransactionModal({
   open,
@@ -14,6 +15,7 @@ export default function PayTransactionModal({
   const tLoading = useTransactionsStore((s) => s.loading);
   const tError = useTransactionsStore((s) => s.error);
   const clearTError = useTransactionsStore((s) => s.clearError);
+  useCurrencyStore((s) => s.currency);
 
   const [localError, setLocalError] = useState(null);
 
