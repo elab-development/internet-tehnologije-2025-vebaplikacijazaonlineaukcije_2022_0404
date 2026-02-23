@@ -10,6 +10,7 @@ import SellerAuctionsTable from '../components/profile/SellerAuctionsTable';
 import ProfileHeader from '../components/profile/ProfileHeader';
 import CreateAuctionModal from '../components/modals/CreateAuctionModal';
 import { FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
+import AdminDashboard from '../components/admin/AdminDashboard';
 
 export default function Profile() {
   const user = useAuthStore((s) => s.user);
@@ -227,10 +228,7 @@ export default function Profile() {
           ) : !user ? (
             <div className='text-white/70'>You are not logged in.</div>
           ) : role === 'admin' ? (
-            <div className='text-white'>
-              <h2 className='text-xl font-semibold'>Admin</h2>
-              <p className='mt-2 text-white/70'>Admin Dashboard upcoming.</p>
-            </div>
+            <AdminDashboard />
           ) : role === 'buyer' ? (
             <div>
               <h2 className='text-xl font-semibold text-white'>My bids</h2>

@@ -22,4 +22,7 @@ export const API = {
   // transactions
   transactions: '/transactions',
   transaction: (id) => `/transactions/${id}`,
+
+  // admin stats
+  adminStats: '/admin/stats',
 };

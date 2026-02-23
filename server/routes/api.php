@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminStatsController;
 use App\Http\Controllers\AuctionController;
 use App\Http\Controllers\BidController;
 use App\Http\Controllers\CategoryController;
@@ -28,13 +29,15 @@ Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/admin/stats', [AdminStatsController::class, 'index']);
+
     Route::resource('categories', CategoryController::class)
         ->only(['store', 'update', 'destroy']);
     Route::resource('auctions', AuctionController::class)
         ->only(['store', 'update', 'destroy']);
 
     Route::resource('bids', BidController::class)
-        ->only(['index', 'show', 'store', 'update', 'destroy']);
+        ->only(['index', 'store', 'update', 'destroy']);
     Route::get('/auctions/{auction}/bids', [BidController::class, 'auctionBids']);
     Route::get('/users/{user}/bids', [BidController::class, 'userBids']);
 

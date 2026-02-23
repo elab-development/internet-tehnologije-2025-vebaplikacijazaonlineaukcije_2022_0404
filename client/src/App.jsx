@@ -15,7 +15,7 @@ function App() {
   return (
     <Router>
       <AuthBootstrap>
-        <div className='min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950'>
+        <div className='min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950'>
           <Navbar />
           <Routes>
             <Route path='/' element={<Home />} />
