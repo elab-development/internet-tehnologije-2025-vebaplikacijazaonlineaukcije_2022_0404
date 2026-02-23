@@ -11,7 +11,20 @@ use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
-    // GET /transactions
+    /**
+     * @OA\Get(
+     *   path="/transactions",
+     *   tags={"Transactions"},
+     *   summary="Lista transakcija (admin: sve, buyer: svoje)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(
+     *     @OA\Property(property="count", type="integer"),
+     *     @OA\Property(property="transactions", type="array", @OA\Items(type="object"))
+     *   )),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=404, description="No transactions", @OA\JsonContent(ref="#/components/schemas/ErrorMessage"))
+     * )
+     */
     public function index(Request $request)
     {
         if (!Auth::check()) {
@@ -39,7 +52,17 @@ class TransactionController extends Controller
         ]);
     }
 
-    // GET /transactions/{transaction}
+    /**
+     * @OA\Get(
+     *   path="/transactions/{id}",
+     *   tags={"Transactions"},
+     *   summary="Detalji transakcije (admin ili buyer-vlasnik)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(@OA\Property(property="transaction", type="object"))),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage"))
+     * )
+     */
     public function show(Request $request, Transaction $transaction)
     {
         if (!Auth::check()) {
@@ -58,7 +81,29 @@ class TransactionController extends Controller
         ]);
     }
 
-    // POST /transactions
+    /**
+     * @OA\Post(
+     *   path="/transactions",
+     *   tags={"Transactions"},
+     *   summary="Kreiranje transakcije (buyer pobednik završene aukcije)",
+     *   security={{"sanctum":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"auction_id"},
+     *       @OA\Property(property="auction_id", type="integer", example=10)
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Kreirano", @OA\JsonContent(
+     *     @OA\Property(property="message", type="string", example="Transaction created successfully"),
+     *     @OA\Property(property="transaction", type="object")
+     *   )),
+     *   @OA\Response(response=403, description="Forbidden (nije buyer / nije pobednik)", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=404, description="Auction not found", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=409, description="Već postoji transakcija", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=422, description="Aukcija nije završena / nema bidova / validation", @OA\JsonContent(ref="#/components/schemas/ValidationError"))
+     * )
+     */
     public function store(Request $request)
     {
         if (!Auth::check()) {

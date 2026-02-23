@@ -11,7 +11,20 @@ use Illuminate\Validation\Rule;
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *   path="/categories",
+     *   tags={"Categories"},
+     *   summary="Lista kategorija (public)",
+     *   @OA\Response(
+     *     response=200,
+     *     description="Lista kategorija",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="count", type="integer", example=3),
+     *       @OA\Property(property="categories", type="array", @OA\Items(type="object"))
+     *     )
+     *   ),
+     *   @OA\Response(response=404, description="Nema kategorija", @OA\JsonContent(ref="#/components/schemas/ErrorMessage"))
+     * )
      */
     public function index()
     {
@@ -36,7 +49,26 @@ class CategoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *   path="/categories",
+     *   tags={"Categories"},
+     *   summary="Kreiranje kategorije (admin)",
+     *   security={{"sanctum":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"name"},
+     *       @OA\Property(property="name", type="string", example="Electronics"),
+     *       @OA\Property(property="description", type="string", nullable=true, example="Opis kategorije")
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Kreirano", @OA\JsonContent(
+     *     @OA\Property(property="message", type="string", example="Category created successfully"),
+     *     @OA\Property(property="category", type="object")
+     *   )),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=422, description="Validation", @OA\JsonContent(ref="#/components/schemas/ValidationError"))
+     * )
      */
     public function store(Request $request)
     {
@@ -58,7 +90,13 @@ class CategoryController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *   path="/categories/{id}",
+     *   tags={"Categories"},
+     *   summary="Detalji kategorije (public)",
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(@OA\Property(property="category", type="object")))
+     * )
      */
     public function show(Category $category)
     {
@@ -76,7 +114,26 @@ class CategoryController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *   path="/categories/{id}",
+     *   tags={"Categories"},
+     *   summary="Update kategorije (admin)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       @OA\Property(property="name", type="string", example="Updated name"),
+     *       @OA\Property(property="description", type="string", nullable=true, example="Updated desc")
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(
+     *     @OA\Property(property="message", type="string"),
+     *     @OA\Property(property="category", type="object")
+     *   )),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=422, description="Validation", @OA\JsonContent(ref="#/components/schemas/ValidationError"))
+     * )
      */
     public function update(Request $request, Category $category)
     {
@@ -110,7 +167,15 @@ class CategoryController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *   path="/categories/{id}",
+     *   tags={"Categories"},
+     *   summary="Brisanje kategorije (admin)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(@OA\Property(property="message", type="string", example="Category deleted successfully"))),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage"))
+     * )
      */
     public function destroy(Category $category)
     {

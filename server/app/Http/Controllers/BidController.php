@@ -12,7 +12,18 @@ use Illuminate\Support\Facades\Auth;
 class BidController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *   path="/bids",
+     *   tags={"Bids"},
+     *   summary="Lista bidova (admin: svi, buyer: samo njegovi)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(
+     *     @OA\Property(property="count", type="integer"),
+     *     @OA\Property(property="bids", type="array", @OA\Items(type="object"))
+     *   )),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=404, description="No bids", @OA\JsonContent(ref="#/components/schemas/ErrorMessage"))
+     * )
      */
     public function index()
     {
@@ -39,6 +50,21 @@ class BidController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *   path="/auctions/{auctionId}/bids",
+     *   tags={"Bids"},
+     *   summary="Bidovi za konkretnu aukciju (admin)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="auctionId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(
+     *     @OA\Property(property="count", type="integer"),
+     *     @OA\Property(property="bids", type="array", @OA\Items(type="object"))
+     *   )),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=404, description="No bids", @OA\JsonContent(ref="#/components/schemas/ErrorMessage"))
+     * )
+     */
     public function auctionBids(Auction $auction)
     {
         if (!Auth::check() || !(Auth::user()->isAdmin())) {
@@ -57,6 +83,21 @@ class BidController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *   path="/users/{userId}/bids",
+     *   tags={"Bids"},
+     *   summary="Bidovi za konkretnog korisnika (admin)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(
+     *     @OA\Property(property="count", type="integer"),
+     *     @OA\Property(property="bids", type="array", @OA\Items(type="object"))
+     *   )),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=404, description="No bids", @OA\JsonContent(ref="#/components/schemas/ErrorMessage"))
+     * )
+     */
     public function userBids(User $user)
     {
         if (!Auth::check() || !(Auth::user()->isAdmin())) {
@@ -84,7 +125,27 @@ class BidController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *   path="/bids",
+     *   tags={"Bids"},
+     *   summary="Postavljanje bida (buyer)",
+     *   security={{"sanctum":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"amount","auction_id"},
+     *       @OA\Property(property="amount", type="number", example=150),
+     *       @OA\Property(property="auction_id", type="integer", example=10)
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(
+     *     @OA\Property(property="message", type="string"),
+     *     @OA\Property(property="bid", type="object")
+     *   )),
+     *   @OA\Response(response=403, description="Forbidden (nije buyer / bid na svoju aukciju)", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=404, description="Auction not found", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=422, description="Validation / auction not active / bid too low", @OA\JsonContent(ref="#/components/schemas/ValidationError"))
+     * )
      */
     public function store(Request $request)
     {
@@ -146,7 +207,23 @@ class BidController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *   path="/bids/{id}",
+     *   tags={"Bids"},
+     *   summary="Update bida (owner ili admin)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(@OA\Property(property="amount", type="number", example=200))
+     *   ),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(
+     *     @OA\Property(property="message", type="string"),
+     *     @OA\Property(property="bid", type="object")
+     *   )),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=422, description="Bid too low / validation", @OA\JsonContent(ref="#/components/schemas/ValidationError"))
+     * )
      */
     public function update(Request $request, Bid $bid)
     {
@@ -189,7 +266,15 @@ class BidController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *   path="/bids/{id}",
+     *   tags={"Bids"},
+     *   summary="Brisanje bida (owner ili admin)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(@OA\Property(property="message", type="string", example="Bid deleted successfully"))),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage"))
+     * )
      */
     public function destroy(Bid $bid)
     {

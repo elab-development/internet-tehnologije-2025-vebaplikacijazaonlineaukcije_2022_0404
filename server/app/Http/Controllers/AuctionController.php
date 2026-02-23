@@ -11,7 +11,40 @@ use Illuminate\Validation\Rule;
 class AuctionController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *   path="/auctions",
+     *   tags={"Auctions"},
+     *   summary="Lista aukcija + filteri + paginacija (public)",
+     *   @OA\Parameter(name="q", in="query", @OA\Schema(type="string")),
+     *   @OA\Parameter(name="title", in="query", @OA\Schema(type="string")),
+     *   @OA\Parameter(name="description", in="query", @OA\Schema(type="string")),
+     *   @OA\Parameter(name="min_start_price", in="query", @OA\Schema(type="number")),
+     *   @OA\Parameter(name="max_start_price", in="query", @OA\Schema(type="number")),
+     *   @OA\Parameter(name="min_highest_bid", in="query", @OA\Schema(type="number")),
+     *   @OA\Parameter(name="max_highest_bid", in="query", @OA\Schema(type="number")),
+     *   @OA\Parameter(name="category_id", in="query", @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="user_id", in="query", @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="starts_before", in="query", @OA\Schema(type="string", format="date")),
+     *   @OA\Parameter(name="starts_after", in="query", @OA\Schema(type="string", format="date")),
+     *   @OA\Parameter(name="ends_before", in="query", @OA\Schema(type="string", format="date")),
+     *   @OA\Parameter(name="ends_after", in="query", @OA\Schema(type="string", format="date")),
+     *   @OA\Parameter(name="sort_by", in="query", @OA\Schema(type="string", example="created_at")),
+     *   @OA\Parameter(name="sort_dir", in="query", @OA\Schema(type="string", enum={"asc","desc"}, example="desc")),
+     *   @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", example=1)),
+     *   @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", example=10)),
+     *   @OA\Response(
+     *     response=200,
+     *     description="OK",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="count", type="integer"),
+     *       @OA\Property(property="page", type="integer"),
+     *       @OA\Property(property="per_page", type="integer"),
+     *       @OA\Property(property="auctions", type="array", @OA\Items(type="object"))
+     *     )
+     *   ),
+     *   @OA\Response(response=404, description="No auctions", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=422, description="Validation", @OA\JsonContent(ref="#/components/schemas/ValidationError"))
+     * )
      */
     public function index(Request $request)
     {
@@ -111,7 +144,30 @@ class AuctionController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *   path="/auctions",
+     *   tags={"Auctions"},
+     *   summary="Kreiranje aukcije (seller/admin)",
+     *   security={{"sanctum":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"title","start_price","start_time","end_time","category_id"},
+     *       @OA\Property(property="title", type="string", example="iPhone 13"),
+     *       @OA\Property(property="description", type="string", nullable=true, example="Polovan, odlican"),
+     *       @OA\Property(property="start_price", type="number", example=100),
+     *       @OA\Property(property="start_time", type="string", format="date-time", example="2026-02-20T10:00:00Z"),
+     *       @OA\Property(property="end_time", type="string", format="date-time", example="2026-02-27T10:00:00Z"),
+     *       @OA\Property(property="category_id", type="integer", example=1)
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(
+     *     @OA\Property(property="message", type="string"),
+     *     @OA\Property(property="auction", type="object")
+     *   )),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=422, description="Validation", @OA\JsonContent(ref="#/components/schemas/ValidationError"))
+     * )
      */
     public function store(Request $request)
     {
@@ -145,7 +201,13 @@ class AuctionController extends Controller
 
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *   path="/auctions/{id}",
+     *   tags={"Auctions"},
+     *   summary="Detalji aukcije (public)",
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(@OA\Property(property="auction", type="object")))
+     * )
      */
     public function show(Auction $auction)
     {
@@ -163,7 +225,30 @@ class AuctionController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *   path="/auctions/{id}",
+     *   tags={"Auctions"},
+     *   summary="Update aukcije (admin ili owner seller)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       @OA\Property(property="title", type="string"),
+     *       @OA\Property(property="description", type="string", nullable=true),
+     *       @OA\Property(property="start_price", type="number"),
+     *       @OA\Property(property="start_time", type="string", format="date-time"),
+     *       @OA\Property(property="end_time", type="string", format="date-time"),
+     *       @OA\Property(property="category_id", type="integer")
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(
+     *     @OA\Property(property="message", type="string"),
+     *     @OA\Property(property="auction", type="object")
+     *   )),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage")),
+     *   @OA\Response(response=422, description="Validation", @OA\JsonContent(ref="#/components/schemas/ValidationError"))
+     * )
      */
     public function update(Request $request, Auction $auction)
     {
@@ -200,6 +285,17 @@ class AuctionController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Delete(
+     *   path="/auctions/{id}",
+     *   tags={"Auctions"},
+     *   summary="Brisanje aukcije (admin ili owner seller)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="OK", @OA\JsonContent(@OA\Property(property="message", type="string"))),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage"))
+     * )
+     */
     public function destroy(Request $request, Auction $auction)
     {
         if (!Auth::check()) {

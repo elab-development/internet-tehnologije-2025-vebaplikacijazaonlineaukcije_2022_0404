@@ -14,8 +14,22 @@ use Illuminate\Support\Facades\DB;
 class AdminStatsController extends Controller
 {
     /**
-     * GET /admin/stats
-     * Admin-only: KPI + chart data
+     * @OA\Get(
+     *   path="/admin/stats",
+     *   tags={"Admin"},
+     *   summary="Admin KPI + chart data",
+     *   security={{"sanctum":{}}},
+     *   @OA\Response(
+     *     response=200,
+     *     description="OK",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="kpis", type="object"),
+     *       @OA\Property(property="charts", type="object"),
+     *       @OA\Property(property="meta", type="object")
+     *     )
+     *   ),
+     *   @OA\Response(response=403, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorMessage"))
+     * )
      */
     public function index(Request $request)
     {
